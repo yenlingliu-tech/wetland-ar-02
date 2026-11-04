@@ -2,7 +2,9 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   <title>濁水溪口｜招潮蟹 AR</title>
 
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -25,6 +27,21 @@
       height: 100dvh;
       overflow: hidden;
     }
+
+    #status {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      padding: 12px 20px;
+      background: rgba(0,0,0,0.65);
+      color: white;
+      border-radius: 12px;
+      font-family: sans-serif;
+      white-space: nowrap;
+      pointer-events: none;
+    }
   </style>
 
   <script>
@@ -33,11 +50,13 @@
         const target = this.el;
 
         target.addEventListener('targetFound', function () {
-          document.getElementById('status').textContent = '辨識成功！';
+          document.getElementById('status').textContent =
+            '辨識成功！';
         });
 
         target.addEventListener('targetLost', function () {
-          document.getElementById('status').textContent = '請對準招潮蟹圖卡';
+          document.getElementById('status').textContent =
+            '請對準招潮蟹圖卡';
         });
       }
     });
@@ -45,24 +64,10 @@
 </head>
 
 <body>
+
   <div class="ar-container">
 
-    <div id="status" style="
-      position:fixed;
-      top:20px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:9999;
-      padding:12px 20px;
-      background:rgba(0,0,0,0.65);
-      color:white;
-      border-radius:12px;
-      font-family:sans-serif;
-      white-space:nowrap;
-      pointer-events:none;
-    ">
-      請對準招潮蟹圖卡
-    </div>
+    <div id="status">請對準招潮蟹圖卡</div>
 
     <a-scene
       mindar-image="imageTargetSrc: ./targets1.mind; autoStart: true; filterMinCF: 0.001; filterBeta: 1000; warmupTolerance: 5; missTolerance: 5;"
@@ -72,19 +77,56 @@
       device-orientation-permission-ui="enabled: false"
       embedded>
 
-      <a-assets></a-assets>
+      <!-- PNG 圖片素材 -->
+      <a-assets>
+        <img id="background" src="./background.PNG">
+        <img id="midground" src="./midground.PNG">
+        <img id="foreground" src="./foreground.PNG">
+      </a-assets>
 
+      <!-- AR 相機 -->
       <a-camera
         position="0 0 0"
         look-controls="enabled: false">
       </a-camera>
 
+      <!-- 圖卡辨識 -->
       <a-entity
         mindar-image-target="targetIndex: 0"
         target-events>
+
+        <!-- 背景 -->
+        <a-image
+          src="#background"
+          position="0 0 0.01"
+          width="1.4"
+          height="0.84"
+          material="transparent: true; depthWrite: false">
+        </a-image>
+
+        <!-- 中景 -->
+        <a-image
+          src="#midground"
+          position="-0.12 0 0.08"
+          width="1.1"
+          height="0.75"
+          material="transparent: true; depthWrite: false">
+        </a-image>
+
+        <!-- 前景 -->
+        <a-image
+          src="#foreground"
+          position="0.34 -0.23 0.22"
+          width="0.65"
+          height="0.6"
+          material="transparent: true; depthWrite: false">
+        </a-image>
+
       </a-entity>
 
     </a-scene>
+
   </div>
+
 </body>
 </html>
