@@ -2,12 +2,17 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
+
   <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    content="width=device-width, initial-scale=1.0,
+    maximum-scale=1.0, user-scalable=no">
 
   <title>濁水溪口｜招潮蟹 AR</title>
 
+  <!-- A-Frame 1.6.0 -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <!-- MindAR 1.2.5 -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
@@ -20,33 +25,48 @@
       background: black;
     }
 
+    /* 全螢幕 AR */
     .ar-container {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100vw;
+      height: 100vh;
       height: 100dvh;
       overflow: hidden;
     }
 
+    a-scene {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 辨識提示文字 */
     #status {
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9999;
+
       padding: 12px 20px;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0, 0, 0, 0.65);
       color: white;
       border-radius: 12px;
+
       font-family: sans-serif;
+      font-size: 16px;
+      text-align: center;
       white-space: nowrap;
       pointer-events: none;
     }
   </style>
 
   <script>
+    // 圖卡辨識事件
     AFRAME.registerComponent('target-events', {
       init: function () {
+
         const target = this.el;
 
         target.addEventListener('targetFound', function () {
@@ -58,7 +78,28 @@
           document.getElementById('status').textContent =
             '請對準招潮蟹圖卡';
         });
+
       }
+    });
+
+    // 圖片載入錯誤提示
+    window.addEventListener('DOMContentLoaded', function () {
+
+      const images = [
+        'background',
+        'midground',
+        'foreground'
+      ];
+
+      images.forEach(function (id) {
+        const img = document.getElementById(id);
+
+        img.addEventListener('error', function () {
+          document.getElementById('status').textContent =
+            '圖片載入失敗：' + img.getAttribute('src');
+        });
+      });
+
     });
   </script>
 </head>
@@ -67,21 +108,48 @@
 
   <div class="ar-container">
 
-    <div id="status">請對準招潮蟹圖卡</div>
+    <!-- 狀態提示 -->
+    <div id="status">
+      請對準招潮蟹圖卡
+    </div>
 
+    <!-- MindAR 場景 -->
     <a-scene
-      mindar-image="imageTargetSrc: ./targets1.mind; autoStart: true; filterMinCF: 0.001; filterBeta: 1000; warmupTolerance: 5; missTolerance: 5;"
+      mindar-image="
+        imageTargetSrc: ./targets1.mind;
+        autoStart: true;
+        filterMinCF: 0.001;
+        filterBeta: 1000;
+        warmupTolerance: 5;
+        missTolerance: 5;
+      "
       color-space="sRGB"
-      renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
+      renderer="colorManagement: true;
+                physicallyCorrectLights: true;
+                alpha: true"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
-      embedded>
+      embedded
+    >
 
       <!-- PNG 圖片素材 -->
       <a-assets>
-        <img id="background" src="./background.PNG">
-        <img id="midground" src="./midground.PNG">
-        <img id="foreground" src="./foreground.PNG">
+
+        <img
+          id="background"
+          src="./background.png"
+          crossorigin="anonymous">
+
+        <img
+          id="midground"
+          src="./midground.png"
+          crossorigin="anonymous">
+
+        <img
+          id="foreground"
+          src="./foreground.png"
+          crossorigin="anonymous">
+
       </a-assets>
 
       <!-- AR 相機 -->
@@ -90,36 +158,51 @@
         look-controls="enabled: false">
       </a-camera>
 
-      <!-- 圖卡辨識 -->
+      <!-- 招潮蟹圖卡辨識 -->
       <a-entity
         mindar-image-target="targetIndex: 0"
         target-events>
 
-        <!-- 背景 -->
+        <!-- 第一層：背景 -->
         <a-image
           src="#background"
           position="0 0 0.01"
           width="1.4"
           height="0.84"
-          material="transparent: true; depthWrite: false">
+          material="
+            shader: flat;
+            transparent: true;
+            depthWrite: false;
+            side: double
+          ">
         </a-image>
 
-        <!-- 中景 -->
+        <!-- 第二層：中景 -->
         <a-image
           src="#midground"
           position="-0.12 0 0.08"
           width="1.1"
           height="0.75"
-          material="transparent: true; depthWrite: false">
+          material="
+            shader: flat;
+            transparent: true;
+            depthWrite: false;
+            side: double
+          ">
         </a-image>
 
-        <!-- 前景 -->
+        <!-- 第三層：前景 -->
         <a-image
           src="#foreground"
           position="0.34 -0.23 0.22"
           width="0.65"
           height="0.6"
-          material="transparent: true; depthWrite: false">
+          material="
+            shader: flat;
+            transparent: true;
+            depthWrite: false;
+            side: double
+          ">
         </a-image>
 
       </a-entity>
